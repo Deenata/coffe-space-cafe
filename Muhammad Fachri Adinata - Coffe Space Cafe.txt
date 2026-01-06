@@ -1,0 +1,50 @@
+1. Public (Pengunjung Umum)
+- Mengakses website Coffee Space Cafe.
+- Melihat menu yang tersedia dan promo terbaru.
+- Melihat menu best seller dan menu terbaru.
+- Membuat akun pelanggan untuk melakukan pemesanan.
+
+2. Pelanggan
+- Login ke sistem menggunakan akun yang sudah dibuat.
+- Melihat dashboard pelanggan dengan pesanan terakhir dan rekomendasi menu.
+- Melihat daftar menu yang tersedia.
+- Menambahkan menu ke keranjang belanja.
+- Mengelola keranjang belanja:
+  - Mengubah jumlah item
+  - Menghapus item dari keranjang
+- Melakukan checkout:
+  - Memilih metode pembayaran (transfer bank, e-wallet)
+  - Mengupload bukti pembayaran
+- Mencetak/menyimpan bukti pemesanan.
+- Mengecek status pesanan secara berkala (menunggu verifikasi, diproses, selesai).
+- Melihat riwayat pesanan dengan filter tanggal dan status.
+
+3. Admin
+- Login ke dashboard admin.
+- Melihat statistik penjualan, pesanan, pelanggan baru, dan menu terbaru.
+- Mengelola menu:
+  - Menambahkan menu baru
+  - Mengedit menu yang sudah ada
+  - Menghapus menu
+  - Mengatur menu sebagai best seller
+- Mengelola user:
+  - Melihat daftar semua pengguna
+  - Menambahkan user baru dengan peran tertentu
+  - Mengedit informasi user
+  - Menghapus user
+- Melihat laporan penjualan dengan filter tanggal.
+- Mencetak atau mengunduh laporan penjualan.
+
+4. Kasir
+- Login ke dashboard kasir.
+- Melihat statistik pesanan dan pembayaran hari ini.
+- Mengelola verifikasi pembayaran:
+  - Melihat daftar pesanan yang belum dibayar
+  - Memeriksa bukti pembayaran yang diunggah pelanggan
+  - Mengubah status pesanan menjadi 'paid'
+- Mengelola pesanan masuk:
+  - Melihat daftar pesanan dengan status 'paid' atau 'proses'
+  - Melihat detail item pesanan
+  - Mengubah status pesanan (proses → selesai)
+  - Menghapus item dari pesanan jika diperlukan
+- Melihat riwayat transaksi dengan filter tanggal dan metode pembayaran.

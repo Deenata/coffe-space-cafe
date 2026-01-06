@@ -1,0 +1,50 @@
+flowchart TB
+  %% Subgraph: Promo
+  subgraph PROMO[Promo]
+    direction TB
+    PA[Mulai] --> PB[Admin buka halaman Promo & Best Seller\nGET: promo_best_seller.index]
+    PB --> PC{Aksi?}
+    PC -->|Tambah Promo| PD[Form Tambah Promo\njudul, deskripsi, gambar?, status, kode, tgl berakhir]
+    PC -->|Edit Promo| PE[Form Edit Promo]
+    PC -->|Hapus Promo| PH[Konfirmasi Hapus]
+
+    PD --> PF[Submit Tambah\nPOST promo_best_seller.promo.store]
+    PE --> PG[Submit Edit\nPUT promo_best_seller.promo.update]
+    PH --> PI[Submit Hapus\nDELETE promo_best_seller.promo.delete]
+
+    PF --> PJ{Validasi OK?}
+    PG --> PK{Validasi OK?}
+
+    PJ -->|Tidak| PD
+    PJ -->|Ya| PL[Jika ada gambar → simpan ke storage/public/promo]
+    PL --> PM[Create Promo di DB]
+    PM --> PN[Redirect Back + success]
+
+    PK -->|Tidak| PE
+    PK -->|Ya| PO[Jika ada gambar → replace file]
+    PO --> PP[Update Promo di DB]
+    PP --> PN
+
+    PI --> PQ[Delete Promo di DB]
+    PQ --> PN
+
+    PN --> PR[Daftar Promo terbarui]
+    PR --> PS[Landing Page: Promo aktif]
+    PS --> PT[Dashboard Pelanggan: Promo aktif & belum kedaluwarsa]
+    PT --> PU[Selesai]
+  end
+
+  %% Subgraph: Best Seller
+  subgraph BEST[Best Seller]
+    direction TB
+    BA[Mulai] --> BB[Admin buka halaman Promo & Best Seller\nGET: promo_best_seller.index]
+    BB --> BC[Checklist Menu Best Seller]
+    BC --> BD[Submit Simpan\nPOST promo_best_seller.best_seller.update]
+    BD --> BE[Ambil best_seller[]]
+    BE --> BF[Set semua Menu.is_best_seller = false]
+    BF --> BG[Set is_best_seller = true untuk ID terpilih]
+    BG --> BH[Redirect Back + success]
+    BH --> BI[Landing Page: tampilkan is_best_seller = true]
+    BI --> BJ[Section Menu Baru: exclude best seller, status tersedia, 4 terbaru]
+    BJ --> BK[Selesai]
+  end 

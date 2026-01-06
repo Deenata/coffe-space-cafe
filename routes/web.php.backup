@@ -1,0 +1,133 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Auth\AuthController;
+use App\Models\Menu;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
+// ========================================
+// PUBLIC ROUTES
+// ========================================
+
+Route::get('/', [App\Http\Controllers\WelcomeController::class, 'index'])->name('welcome');
+
+// Authentication routes
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::get('/register', function () {
+    return view('auth.register');
+})->name('register');
+Route::post('/register', [AuthController::class, 'register'])->name('register.post');
+
+// Logout route
+Route::post('/logout', function () {
+    Auth::logout();
+    return redirect('/login');
+})->name('logout');
+
+// ========================================
+// ADMIN ROUTES
+// ========================================
+
+Route::middleware(['auth'])->group(function () {
+    // Dashboard Admin
+    Route::get('/dashboard-admin', [App\Http\Controllers\Admin\DashboardAdminController::class, 'index'])->name('dashboard.admin');
+    
+    // Menu Management
+    Route::get('/menu-management', [App\Http\Controllers\Admin\MenuController::class, 'index'])->name('menu.management');
+    Route::post('/menu-management', [App\Http\Controllers\Admin\MenuController::class, 'store'])->name('menu.store');
+    Route::put('/menu-management/{id}', [App\Http\Controllers\Admin\MenuController::class, 'update'])->name('menu.update');
+    Route::delete('/menu-management/{id}', [App\Http\Controllers\Admin\MenuController::class, 'destroy'])->name('menu.delete');
+    
+    // User Management
+    Route::get('/user-management', [App\Http\Controllers\Admin\UserManagementController::class, 'index'])->name('user.management');
+    Route::post('/user-management', [App\Http\Controllers\Admin\UserManagementController::class, 'store'])->name('user.store');
+    Route::put('/user-management/{id}', [App\Http\Controllers\Admin\UserManagementController::class, 'update'])->name('user.update');
+    Route::get('/user-management/{id}', [App\Http\Controllers\Admin\UserManagementController::class, 'show'])->name('user.show');
+    Route::delete('/user-management/{id}', [App\Http\Controllers\Admin\UserManagementController::class, 'destroy'])->name('user.destroy');
+    
+    // Sales Report
+    Route::get('/sales-report', [App\Http\Controllers\Admin\SalesReportController::class, 'index'])->name('sales.report');
+    
+    // Transaction History
+    Route::get('/transaction-history', [App\Http\Controllers\Admin\TransactionHistoryController::class, 'index'])->name('transaction.history');
+    
+    // Settings
+    Route::get('/settings', [App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings');
+    
+    // Promo & Best Seller Management
+    Route::get('/promo-best-seller', [App\Http\Controllers\Admin\PromoBestSellerController::class, 'index'])->name('promo_best_seller.index');
+    Route::post('/promo-best-seller/promo', [App\Http\Controllers\Admin\PromoBestSellerController::class, 'storePromo'])->name('promo_best_seller.promo.store');
+    Route::put('/promo-best-seller/promo/{id}', [App\Http\Controllers\Admin\PromoBestSellerController::class, 'updatePromo'])->name('promo_best_seller.promo.update');
+    Route::delete('/promo-best-seller/promo/{id}', [App\Http\Controllers\Admin\PromoBestSellerController::class, 'destroyPromo'])->name('promo_best_seller.promo.delete');
+    Route::post('/promo-best-seller/best-seller', [App\Http\Controllers\Admin\PromoBestSellerController::class, 'updateBestSeller'])->name('promo_best_seller.best_seller.update');
+});
+
+// ========================================
+// KASIR ROUTES
+// ========================================
+
+Route::middleware(['auth'])->group(function () {
+    // Dashboard Kasir
+    Route::get('/dashboard-kasir', [App\Http\Controllers\Kasir\DashboardKasirController::class, 'index'])->name('dashboard.kasir');
+    
+    // Pesanan Masuk
+    Route::get('/pesanan-masuk', [App\Http\Controllers\Kasir\PesananKasirController::class, 'index'])->name('pesanan.masuk');
+    Route::put('/pesanan-masuk/{id}/status', [App\Http\Controllers\Kasir\PesananKasirController::class, 'updateStatus'])->name('pesanan.masuk.status');
+    Route::get('/pesanan-masuk/{id}/items', [App\Http\Controllers\Kasir\PesananKasirController::class, 'getOrderItems'])->name('pesanan.masuk.items');
+    Route::post('/pesanan-masuk/hapus-item', [App\Http\Controllers\Kasir\PesananKasirController::class, 'hapusItemPesanan'])->name('pesanan.masuk.hapus-item');
+    
+    // Verifikasi Pembayaran
+    Route::get('/verifikasi-pembayaran', [App\Http\Controllers\Kasir\VerifikasiPembayaranController::class, 'index'])->name('verifikasi.pembayaran');
+    Route::put('/verifikasi-pembayaran/{id}', [App\Http\Controllers\Kasir\VerifikasiPembayaranController::class, 'verif'])->name('verifikasi.pembayaran.verif');
+    
+    // Riwayat Transaksi
+    Route::get('/riwayat-transaksi-kasir', [App\Http\Controllers\Kasir\TransaksiKasirController::class, 'index'])->name('riwayat.transaksi.kasir');
+    
+    // Pengaturan Kasir
+    Route::get('/pengaturan-kasir', [App\Http\Controllers\Kasir\PengaturanKasirController::class, 'show'])->name('pengaturan.kasir');
+    Route::put('/pengaturan-kasir', [App\Http\Controllers\Kasir\PengaturanKasirController::class, 'update'])->name('pengaturan.kasir.update');
+});
+
+// ========================================
+// PELANGGAN ROUTES
+// ========================================
+
+// Public pelanggan routes (no auth required)
+Route::get('/dashboard-pelanggan', [App\Http\Controllers\Pelanggan\DashboardPelangganController::class, 'index'])->name('pelanggan.dashboard');
+Route::get('/pelanggan/lihat-menu', [App\Http\Controllers\Pelanggan\PelangganMenuController::class, 'index'])->name('pelanggan.lihat-menu');
+
+// Authenticated pelanggan routes
+Route::middleware(['auth'])->group(function () {
+    // Status Pesanan
+    Route::get('/status-pesanan', [App\Http\Controllers\Pelanggan\KeranjangController::class, 'statusPesanan'])->name('status.pesanan');
+    
+    // Riwayat Pesanan
+    Route::get('/riwayat-pesanan', [App\Http\Controllers\Pelanggan\KeranjangController::class, 'riwayatPesanan'])->name('pelanggan.riwayat');
+    
+    // Pengaturan Akun
+    Route::get('/pengaturan-akun', [App\Http\Controllers\Pelanggan\SettingsController::class, 'showAccount'])->name('pelanggan.pengaturan');
+    Route::put('/settings/account', [App\Http\Controllers\Pelanggan\SettingsController::class, 'updateAccount'])->name('settings.account.update');
+    
+    // Keranjang & Checkout
+    Route::post('/keranjang/tambah', [App\Http\Controllers\Pelanggan\KeranjangController::class, 'store'])->name('keranjang.tambah');
+    Route::get('/keranjang', [App\Http\Controllers\Pelanggan\KeranjangController::class, 'index'])->name('keranjang.index');
+    Route::delete('/keranjang/{id}', [App\Http\Controllers\Pelanggan\KeranjangController::class, 'destroy'])->name('keranjang.hapus');
+    Route::patch('/keranjang/{id}/qty', [App\Http\Controllers\Pelanggan\KeranjangController::class, 'updateQty'])->name('keranjang.qty');
+    Route::get('/checkout', [App\Http\Controllers\Pelanggan\KeranjangController::class, 'checkout'])->name('keranjang.checkout');
+    Route::post('/checkout', [App\Http\Controllers\Pelanggan\KeranjangController::class, 'bayar'])->name('keranjang.bayar');
+});
+
+// ========================================
+// LEGACY ROUTES (for backward compatibility)
+// ========================================
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->name('dashboard');
+
+
+
